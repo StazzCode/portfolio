@@ -15,6 +15,7 @@ import { I18nProvider } from './lib/i18n'
 export function App() {
   const footerRef = useRef<HTMLElement>(null)
   const gaugeRef = useRef<HTMLDivElement>(null)
+  const gapRef = useRef<HTMLCanvasElement>(null)
   const { progress, reveal, floodRef } = useScrollMetrics(footerRef)
 
   // Icône d'onglet : sphère tramée animée
@@ -23,7 +24,7 @@ export function App() {
   return (
     <I18nProvider>
       <div id="top" className="page">
-        <DitherBackground floodRef={floodRef} probeRef={gaugeRef} />
+        <DitherBackground floodRef={floodRef} probeRef={gaugeRef} gapRef={gapRef} />
         <ScrollGauge ref={gaugeRef} progress={progress} />
 
         {/* Colonne centrale, posée sur le shader */}
@@ -37,6 +38,11 @@ export function App() {
             <Skills />
             <Journey />
           </main>
+        </div>
+
+        {/* Mobile : le shader réapparaît entre la colonne et le footer */}
+        <div className="shader-gap" aria-hidden="true">
+          <canvas ref={gapRef} className="dither-gap" />
         </div>
 
         <Footer ref={footerRef} reveal={reveal} />

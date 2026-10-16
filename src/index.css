@@ -38,9 +38,9 @@ body {
 }
 
 /* Ce qui dépasse de la page (rebond du scroll, zone sous la barre d'adresse flottante
-   de Safari) : crème en haut comme le hero, bleu en bas comme le footer */
-html {
-  background: linear-gradient(to bottom, var(--cream) 50%, var(--accent) 50%);
+   de Safari) : crème, puis bleu comme le footer quand on arrive en bas */
+html[data-end='1'] {
+  background: var(--accent);
 }
 
 a {
@@ -73,6 +73,24 @@ a:hover {
   height: calc(100lvh + 160px);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+}
+
+/* Mobile : canvas posés dans la page (ils défilent avec elle) */
+.dither-top,
+.dither-gap {
+  display: block;
+  width: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.dither-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: calc(56px + min(34vh, 290px) + 8px);
+}
+.shader-gap {
+  display: none;
 }
 
 /* ── Colonne centrale ─────────────────────────────────────────────── */
@@ -740,8 +758,15 @@ a:hover {
     height: 2px;
   }
 
+  .shader-gap {
+    display: block;
+    height: 140px;
+  }
+  .dither-gap {
+    height: 100%;
+  }
   .big-footer {
-    margin-top: 140px;
+    margin-top: 0;
   }
   .bf-inner {
     gap: 36px;

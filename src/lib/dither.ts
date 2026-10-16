@@ -8,7 +8,7 @@ precision highp float;
 uniform vec2 uRes; uniform float uTime; uniform vec2 uMouse; uniform float uMouseOn;
 uniform vec3 uCream; uniform vec3 uPale; uniform vec3 uAccent; uniform vec3 uDeep;
 uniform float uDensity; uniform float uScroll; uniform float uCenterFade;
-uniform vec2 uTap; uniform float uTapAge; uniform float uFlood;
+uniform vec2 uTap; uniform float uTapAge; uniform float uFlood; uniform float uRef;
 
 float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
 float noise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); vec2 u=f*f*(3.0-2.0*f);
@@ -21,7 +21,7 @@ float bayer8(vec2 a){ return bayer4(0.5*a)*0.25+bayer2(a); }
 
 void main(){
   vec2 frag=gl_FragCoord.xy;
-  vec2 uv=frag/uRes.y + vec2(0.0, uScroll);
+  vec2 uv=frag/uRef + vec2(0.0, uScroll);
   float t=uTime*0.05;
   vec2 q=vec2(fbm(uv*1.4+vec2(0.0,t)), fbm(uv*1.4+vec2(5.2,1.3)-t));
   float f=fbm(uv*2.0+2.2*q+vec2(t*1.4,-t));
@@ -29,10 +29,10 @@ void main(){
   float v=f*0.9+band*0.3;
 
   // Onde qui suit la souris
-  vec2 m=uMouse/uRes.y; float d=length(frag/uRes.y-m);
+  vec2 m=uMouse/uRef; float d=length(frag/uRef-m);
   v+=uMouseOn*0.45*exp(-d*d*14.0)*(0.65+0.35*sin(d*36.0-uTime*3.0));
   // Onde lancée par un clic / un toucher
-  float tr=uTapAge*0.55; float td=length(frag/uRes.y-uTap/uRes.y);
+  float tr=uTapAge*0.55; float td=length(frag/uRef-uTap/uRef);
   v+=step(uTapAge,2.0)*0.7*(1.0-uTapAge*0.5)*exp(-pow((td-tr)*16.0,2.0));
 
   // Plus d'encre sur les bords qu'au centre (sauf sur mobile)
@@ -68,6 +68,7 @@ const UNIFORMS = [
   'uTap',
   'uTapAge',
   'uFlood',
+  'uRef',
 ] as const
 type UniformName = (typeof UNIFORMS)[number]
 
@@ -78,6 +79,12 @@ export interface DitherOptions {
   speed?: number
   /** Lu à chaque image : 0 → fond normal, 1 → fond entièrement bleu */
   getFlood?: () => number
+  /** Décalage vertical du motif (par défaut : léger parallaxe lié au scroll) */
+  getScroll?: () => number
+  /** Hauteur (px CSS) qui fixe l'échelle du motif (par défaut : hauteur du canvas) */
+  getRefHeight?: () => number
+  /** Faux → on ne dessine pas (canvas hors de l'écran) */
+  isActive?: () => boolean
   /** Appelé après chaque rendu, pour lire des pixels du canvas si besoin */
   afterDraw?: (renderer: DitherRenderer) => void
 }
@@ -174,12 +181,15 @@ export function createDither(
 
   const onMove = (e: PointerEvent) => {
     if (e.pointerType === 'touch') return
-    mouse.x = e.clientX
-    mouse.y = e.clientY
+    const r = canvas.getBoundingClientRect()
+    mouse.x = e.clientX - r.left
+    mouse.y = e.clientY - r.top
     mouse.target = 1
   }
   const onDown = (e: PointerEvent) => {
-    tap = { x: e.clientX, y: e.clientY, age: 0 }
+    // Coordonnées propres au canvas : l'onde reste accrochée au contenu qui défile
+    const r = canvas.getBoundingClientRect()
+    tap = { x: e.clientX - r.left, y: e.clientY - r.top, age: 0 }
   }
   const onLeave = () => {
     mouse.target = 0
@@ -192,6 +202,9 @@ export function createDither(
 
   const renderer: DitherRenderer = {
     luminanceAt(clientX, clientY) {
+      const box = canvas.getBoundingClientRect()
+      clientX -= box.left
+      clientY -= box.top
       const w = canvas.width
       const h = canvas.height
       const cx = Math.max(0, Math.min(w - 4, Math.floor(clientX / px) - 2))
@@ -204,7 +217,14 @@ export function createDither(
       }
       return lum / 16
     },
-    luminanceMap(rect) {
+    luminanceMap(screenRect) {
+      const box = canvas.getBoundingClientRect()
+      const rect = {
+        left: screenRect.left - box.left,
+        right: screenRect.right - box.left,
+        top: screenRect.top - box.top,
+        bottom: screenRect.bottom - box.top,
+      }
       const w = canvas.width
       const h = canvas.height
       const x0 = Math.max(0, Math.floor(rect.left / px) - 1)
@@ -216,7 +236,9 @@ export function createDither(
       const data = new Uint8Array(rw * rh * 4)
       gl.readPixels(x0, y0, rw, rh, gl.RGBA, gl.UNSIGNED_BYTE, data)
 
-      return (clientX, clientY) => {
+      return (screenX, screenY) => {
+        const clientX = screenX - box.left
+        const clientY = screenY - box.top
         // Moyenne sur 2×2 pixels du shader autour du point
         const cx = Math.floor(clientX / px) - x0
         const cy = Math.floor(h - clientY / px) - y0
@@ -250,6 +272,10 @@ export function createDither(
     mouse.on += (mouse.target - mouse.on) * Math.min(1, dt * 4)
     if (tap) tap.age += dt
     flood += ((options.getFlood?.() ?? 0) - flood) * Math.min(1, dt * 6)
+    if (options.isActive && !options.isActive()) {
+      raf = requestAnimationFrame(frame)
+      return
+    }
 
     const w = canvas.width
     const h = canvas.height
@@ -262,7 +288,11 @@ export function createDither(
     gl.uniform3fv(u.uAccent, accent)
     gl.uniform3fv(u.uDeep, deep)
     gl.uniform1f(u.uDensity, options.density ?? 0.55)
-    gl.uniform1f(u.uScroll, (window.scrollY / Math.max(1, window.innerHeight)) * 0.35)
+    gl.uniform1f(
+      u.uScroll,
+      options.getScroll?.() ?? (window.scrollY / Math.max(1, window.innerHeight)) * 0.35
+    )
+    gl.uniform1f(u.uRef, options.getRefHeight ? options.getRefHeight() / px : h)
     gl.uniform1f(u.uCenterFade, window.innerWidth <= 640 ? 0 : 1)
     gl.uniform2f(u.uTap, tap ? tap.x / px : -9999, tap ? h - tap.y / px : -9999)
     gl.uniform1f(u.uTapAge, tap ? tap.age : 99)

@@ -1,5 +1,5 @@
 import './index.css'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { DitherBackground } from './components/DitherBackground'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
@@ -9,6 +9,7 @@ import { Projects } from './components/Projects'
 import { ScrollGauge } from './components/ScrollGauge'
 import { Skills } from './components/Skills'
 import { useScrollMetrics } from './hooks/useScrollMetrics'
+import { startDitherFavicon } from './lib/favicon'
 import { I18nProvider } from './lib/i18n'
 
 export function App() {
@@ -16,6 +17,9 @@ export function App() {
   const gaugeRef = useRef<HTMLDivElement>(null)
   const [gaugeLight, setGaugeLight] = useState(false)
   const { progress, reveal, floodRef } = useScrollMetrics(footerRef)
+
+  // Icône d'onglet : sphère tramée animée
+  useEffect(() => startDitherFavicon(), [])
 
   return (
     <I18nProvider>

@@ -1,5 +1,5 @@
 import './index.css'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { DitherBackground } from './components/DitherBackground'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
@@ -15,7 +15,6 @@ import { I18nProvider } from './lib/i18n'
 export function App() {
   const footerRef = useRef<HTMLElement>(null)
   const gaugeRef = useRef<HTMLDivElement>(null)
-  const [gaugeLight, setGaugeLight] = useState(false)
   const { progress, reveal, floodRef } = useScrollMetrics(footerRef)
 
   // Icône d'onglet : sphère tramée animée
@@ -24,8 +23,8 @@ export function App() {
   return (
     <I18nProvider>
       <div id="top" className="page">
-        <DitherBackground floodRef={floodRef} probeRef={gaugeRef} onProbe={setGaugeLight} />
-        <ScrollGauge ref={gaugeRef} progress={progress} light={gaugeLight} />
+        <DitherBackground floodRef={floodRef} probeRef={gaugeRef} />
+        <ScrollGauge ref={gaugeRef} progress={progress} />
 
         {/* Colonne centrale, posée sur le shader */}
         <div className="sheet">

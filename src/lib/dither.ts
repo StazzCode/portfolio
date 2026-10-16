@@ -160,12 +160,11 @@ export function createDither(
   let sizedW = 0
   let sizedH = 0
   const resize = () => {
-    const w = window.innerWidth
-    const h = window.innerHeight
-    // Sur mobile, la barre d'adresse qui se replie change la hauteur pendant le scroll :
-    // redimensionner le canvas à chaque fois l'efface et le fait clignoter. On ignore
-    // ces petites variations de hauteur tant que la largeur ne change pas.
-    if (w === sizedW && Math.abs(h - sizedH) < 160) return
+    // Taille réelle du canvas à l'écran (100lvh en CSS) : elle ne change pas quand la
+    // barre d'adresse mobile se replie, donc pas d'effacement ni de clignotement
+    const w = canvas.clientWidth || window.innerWidth
+    const h = canvas.clientHeight || window.innerHeight
+    if (w === sizedW && h === sizedH) return
     sizedW = w
     sizedH = h
     canvas.width = Math.ceil(w / px)

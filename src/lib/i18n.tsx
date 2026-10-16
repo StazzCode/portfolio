@@ -67,5 +67,5 @@ export const ui = {
   },
   links: { fr: 'Liens', en: 'Links' },
   backToTop: { fr: 'Haut de page', en: 'Back to top' },
-  setIn: { fr: 'Composé en', en: 'Set in' },
+  setIn: { fr: 'Composé avec', en: 'Set in' },
 } satisfies Record<string, Localized>

@@ -8,7 +8,7 @@ precision highp float;
 uniform vec2 uRes; uniform float uTime; uniform vec2 uMouse; uniform float uMouseOn;
 uniform vec3 uCream; uniform vec3 uPale; uniform vec3 uAccent; uniform vec3 uDeep;
 uniform float uDensity; uniform float uScroll; uniform float uCenterFade;
-uniform vec2 uTap; uniform float uTapAge; uniform float uFlood; uniform float uRef;
+uniform vec3 uTaps[6]; uniform float uFlood; uniform float uRef;
 
 float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
 float noise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); vec2 u=f*f*(3.0-2.0*f);
@@ -32,8 +32,12 @@ void main(){
   vec2 m=uMouse/uRef; float d=length(frag/uRef-m);
   v+=uMouseOn*0.45*exp(-d*d*14.0)*(0.65+0.35*sin(d*36.0-uTime*3.0));
   // Onde lancée par un clic / un toucher
-  float tr=uTapAge*0.55; float td=length(frag/uRef-uTap/uRef);
-  v+=step(uTapAge,2.0)*0.7*(1.0-uTapAge*0.5)*exp(-pow((td-tr)*16.0,2.0));
+  // (plusieurs vagues peuvent se superposer : x, y, âge)
+  for(int i=0;i<6;i++){
+    vec3 tp=uTaps[i];
+    float tr=tp.z*0.55; float td=length(frag/uRef-tp.xy/uRef);
+    v+=step(tp.z,2.0)*0.7*(1.0-tp.z*0.5)*exp(-pow((td-tr)*16.0,2.0));
+  }
 
   // Plus d'encre sur les bords qu'au centre (sauf sur mobile)
   float cx=abs(frag.x/uRes.x-0.5)*2.0;
@@ -65,8 +69,7 @@ const UNIFORMS = [
   'uDensity',
   'uScroll',
   'uCenterFade',
-  'uTap',
-  'uTapAge',
+  'uTaps',
   'uFlood',
   'uRef',
 ] as const
@@ -158,7 +161,10 @@ export function createDither(
   const speed = reduced ? 0 : (options.speed ?? 1)
 
   const mouse = { x: -9999, y: -9999, on: 0, target: 0 }
-  let tap: { x: number; y: number; age: number } | null = null
+  /** Vagues en cours (les plus anciennes sont remplacées au-delà de 6) */
+  const MAX_TAPS = 6
+  let taps: { x: number; y: number; age: number }[] = []
+  const tapData = new Float32Array(MAX_TAPS * 3)
   let t = 0
   let flood = 0
   let last = performance.now()
@@ -189,7 +195,8 @@ export function createDither(
   const onDown = (e: PointerEvent) => {
     // Coordonnées propres au canvas : l'onde reste accrochée au contenu qui défile
     const r = canvas.getBoundingClientRect()
-    tap = { x: e.clientX - r.left, y: e.clientY - r.top, age: 0 }
+    taps.push({ x: e.clientX - r.left, y: e.clientY - r.top, age: 0 })
+    if (taps.length > MAX_TAPS) taps.shift()
   }
   const onLeave = () => {
     mouse.target = 0
@@ -270,7 +277,8 @@ export function createDither(
     last = now
     t += dt * speed
     mouse.on += (mouse.target - mouse.on) * Math.min(1, dt * 4)
-    if (tap) tap.age += dt
+    for (const tp of taps) tp.age += dt
+    taps = taps.filter((tp) => tp.age < 2)
     flood += ((options.getFlood?.() ?? 0) - flood) * Math.min(1, dt * 6)
     if (options.isActive && !options.isActive()) {
       raf = requestAnimationFrame(frame)
@@ -294,8 +302,13 @@ export function createDither(
     )
     gl.uniform1f(u.uRef, options.getRefHeight ? options.getRefHeight() / px : h)
     gl.uniform1f(u.uCenterFade, window.innerWidth <= 640 ? 0 : 1)
-    gl.uniform2f(u.uTap, tap ? tap.x / px : -9999, tap ? h - tap.y / px : -9999)
-    gl.uniform1f(u.uTapAge, tap ? tap.age : 99)
+    for (let i = 0; i < MAX_TAPS; i++) {
+      const tp = taps[i]
+      tapData[i * 3] = tp ? tp.x / px : -9999
+      tapData[i * 3 + 1] = tp ? h - tp.y / px : -9999
+      tapData[i * 3 + 2] = tp ? tp.age : 99
+    }
+    gl.uniform3fv(u.uTaps, tapData)
     gl.uniform1f(u.uFlood, flood)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
 

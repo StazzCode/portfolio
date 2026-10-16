@@ -261,6 +261,9 @@ a:hover {
   gap: 8px 32px;
   align-items: baseline;
 }
+.entry:last-child {
+    padding-bottom: 4em;
+}
 .entry-year {
   font-size: 14px;
   color: #6b7280;

@@ -4,19 +4,13 @@ interface ItemLinkProps {
 }
 
 export function ItemLink({ title, url }: ItemLinkProps) {
-  if (url) {
-    return (
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group hover:text-link-blue inline-flex w-fit items-center gap-2 text-lg text-gray-900 sm:text-xl"
-      >
-        <span className="group-hover:underline">{title}</span>
-        <span className="font-['DepartureMono'] text-xl leading-none">↗</span>
-      </a>
-    )
-  }
-
-  return <span className="text-lg text-gray-900 sm:text-xl">{title}</span>
+  if (!url) return <span className="item-name">{title}</span>
+  return (
+    <a className="item-link item-name" href={url} target="_blank" rel="noopener noreferrer">
+      <span className="item-title">{title}</span>
+      <span className="font-mono" aria-hidden="true">
+        ↗
+      </span>
+    </a>
+  )
 }

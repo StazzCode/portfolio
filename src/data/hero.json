@@ -1,6 +1,12 @@
 {
   "name": "Kellian Mirey",
-  "tagline": "Étudiant Développeur Full-Stack",
+  "tagline": {
+    "fr": "Étudiant Développeur Full-Stack",
+    "en": "Full-Stack Developer Student"
+  },
   "location": "Lille, France",
-  "intro": "Je suis étudiant en BUT Informatique à Lille, en formation pour devenir développeur full-stack, avec une appétence particulière pour le front-end."
+  "intro": {
+    "fr": "Je suis étudiant en BUT Informatique à Lille, en formation pour devenir développeur full-stack, avec une appétence particulière pour le front-end.",
+    "en": "I'm a computer science student (BUT Informatique) in Lille, training to become a full-stack developer, with a particular taste for front-end work."
+  }
 }

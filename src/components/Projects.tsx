@@ -1,33 +1,26 @@
-import projectsData from '../data/projects.json'
+import projects from '../data/projects.json'
+import { ui, useI18n } from '../lib/i18n'
 import { ItemLink } from './ItemLink'
-import { TechTag } from './TechTag'
 import { SectionTitle } from './SectionTitle'
+import { TechTags } from './TechTag'
 
 export function Projects() {
+  const { t } = useI18n()
   return (
-    <section className="mt-20 flex flex-col gap-6">
-      <SectionTitle title="Projets" />
-      <div className="flex flex-col gap-10">
-        {projectsData.map((project, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-1 items-baseline gap-2 sm:grid-cols-[7rem_1fr] sm:gap-8"
-          >
-            <span className="font-['DepartureMono'] text-sm text-gray-500 sm:text-base">
-              {project.year}
-            </span>
-            <div className="flex flex-col gap-3">
-              <ItemLink title={project.name} url={project.link} />
-              <p className="text-base leading-relaxed text-gray-500">{project.description}</p>
-              <div className="flex flex-wrap gap-2">
-                {project.tech.map((tech, techIndex) => (
-                  <TechTag key={techIndex} tech={tech} className="text-sm" />
-                ))}
-              </div>
+    <section id="projets" className="section">
+      <SectionTitle index={1} title={t(ui.projects)} accent />
+      <ol className="entries projects-list">
+        {projects.map((project) => (
+          <li key={project.link} className="entry">
+            <span className="entry-year font-mono">{project.year}</span>
+            <div className="entry-body">
+              <ItemLink title={t(project.name)} url={project.link} />
+              <p className="entry-text">{t(project.description)}</p>
+              <TechTags tech={project.tech} />
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ol>
     </section>
   )
 }

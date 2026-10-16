@@ -1,22 +1,31 @@
 [
   {
     "year": "2026",
-    "name": "Application de RDV",
-    "description": "Une application de prise de rendez-vous avec un calendrier et un système d'authentification, développée avec Spring-Boot",
+    "name": { "fr": "Application de RDV", "en": "Appointment booking app" },
+    "description": {
+      "fr": "Une application de prise de rendez-vous avec un calendrier et un système d'authentification, développée avec Spring Boot.",
+      "en": "An appointment booking app with a calendar and an authentication system, built with Spring Boot."
+    },
     "link": "https://github.com/StazzCode/SAE_RDV_2026",
-    "tech": ["Java", "Spring-Boot", "Hibernate"]
+    "tech": ["Java", "Spring Boot", "Hibernate"]
   },
   {
     "year": "2025",
-    "name": "Clone Agar.io",
-    "description": "Clone simplifié d’Agar.io, jouable en temps réel, développé en trinôme avec JavaScript, Socket.IO et Express.js.",
+    "name": { "fr": "Clone Agar.io", "en": "Agar.io clone" },
+    "description": {
+      "fr": "Clone simplifié d'Agar.io, jouable en temps réel, développé en trinôme avec JavaScript, Socket.IO et Express.js.",
+      "en": "A simplified real-time Agar.io clone, built as a team of three with JavaScript, Socket.IO and Express.js."
+    },
     "link": "https://github.com/StazzCode/Agar.io_Clone",
     "tech": ["JavaScript", "Express", "Socket.io"]
   },
   {
     "year": "2025",
-    "name": "Application de messagerie",
-    "description": "Application de messagerie en ligne, basée sur une API Java/Jakarta EE en utilisant le modèle MVC, déployée sur Tomcat.",
+    "name": { "fr": "Application de messagerie", "en": "Messaging app" },
+    "description": {
+      "fr": "Application de messagerie en ligne, basée sur une API Java/Jakarta EE en utilisant le modèle MVC, déployée sur Tomcat.",
+      "en": "An online messaging app based on a Java/Jakarta EE API following the MVC pattern, deployed on Tomcat."
+    },
     "link": "https://github.com/StazzCode/SAE_WEB_ChatApp",
     "tech": ["Java", "Jakarta EE"]
   }

@@ -1,19 +1,23 @@
 [
   {
-    "year": "2026 - Present",
+    "year": { "fr": "2026 — Auj.", "en": "2026 — Now" },
     "company": "Infotel",
-    "role": "Stagiaire développeur",
-    "description": "Développement d'un projet interne, lié au Green-IT.",
-    "type": "school",
-    "tech": ["Spring-Boot", "Angular"]
+    "role": { "fr": "Stagiaire développeur", "en": "Developer intern" },
+    "description": {
+      "fr": "Développement d'un projet interne, lié au Green-IT.",
+      "en": "Development of an internal project focused on Green IT."
+    },
+    "tech": ["Spring Boot", "Angular"]
   },
   {
-    "year": "2025",
+    "year": { "fr": "2025", "en": "2025" },
     "company": "qalmo",
     "url": "https://qalmo.fr",
-    "role": "Stagiaire développeur React-Native",
-    "description": "Mise à jour de l'application mobile de qalmo et développement d'une nouvelle fonctionnalité",
-    "type": "school",
-    "tech": ["TypeScript", "React-Native", "Redux"]
+    "role": { "fr": "Stagiaire développeur React Native", "en": "React Native developer intern" },
+    "description": {
+      "fr": "Mise à jour de l'application mobile de qalmo et développement d'une nouvelle fonctionnalité.",
+      "en": "Updated the qalmo mobile app and built a new feature."
+    },
+    "tech": ["TypeScript", "React Native", "Redux"]
   }
 ]

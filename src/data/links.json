@@ -1,20 +1,7 @@
-[
-  {
-    "name": "Email",
-    "url": "mailto:kellian.mirey@outlook.fr",
-    "icon": "mail.svg",
-    "handle": "kellian.mirey@outlook.fr"
-  },
-  {
-    "name": "LinkedIn",
-    "url": "www.linkedin.com/in/kellianmirey",
-    "icon": "linkedin.svg",
-    "handle": "kellianmirey"
-  },
-  {
-    "name": "GitHub",
-    "url": "https://github.com/StazzCode",
-    "icon": "github.svg",
-    "handle": "stazzcode"
-  }
-]
+{
+  "email": "kellian.mirey@outlook.fr",
+  "linkedin": "https://www.linkedin.com/in/kellianmirey",
+  "github": "https://github.com/StazzCode",
+  "font": "https://departuremono.com",
+  "cv": "./cv-kellian-mirey.pdf"
+}

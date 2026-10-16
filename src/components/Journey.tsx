@@ -1,36 +1,27 @@
-import journeyData from '../data/journey.json'
+import journey from '../data/journey.json'
+import { ui, useI18n } from '../lib/i18n'
 import { ItemLink } from './ItemLink'
 import { SectionTitle } from './SectionTitle'
-import { TechTag } from './TechTag'
+import { TechTags } from './TechTag'
 
 export function Journey() {
+  const { t } = useI18n()
   return (
-    <section className="mt-20 flex flex-col gap-6">
-      <SectionTitle title="Parcours" />
-      <div className="flex flex-col gap-10">
-        {journeyData.map((item, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-1 items-baseline gap-2 sm:grid-cols-[7rem_1fr] sm:gap-8"
-          >
-            <span className="font-['DepartureMono'] text-sm text-gray-500 sm:text-base">
-              {item.year}
-            </span>
-            <div className="flex flex-col gap-2">
+    <section id="parcours" className="section">
+      <SectionTitle index={3} title={t(ui.journey)} />
+      <ol className="entries timeline">
+        {journey.map((item) => (
+          <li key={item.company} className="entry">
+            <span className="entry-year font-mono">{t(item.year)}</span>
+            <div className="entry-body">
               <ItemLink title={item.company} url={item.url} />
-              <span className="text-base text-gray-600">{item.role}</span>
-              <span className="text-base leading-relaxed text-gray-500">{item.description}</span>
-              {item.tech && item.tech.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {item.tech.map((tech, techIndex) => (
-                    <TechTag key={techIndex} tech={tech} className="text-sm" />
-                  ))}
-                </div>
-              )}
+              <span className="text-accent font-mono text-sm">{t(item.role)}</span>
+              <span className="entry-text">{t(item.description)}</span>
+              <TechTags tech={item.tech} />
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ol>
     </section>
   )
 }

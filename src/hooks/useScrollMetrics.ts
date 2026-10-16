@@ -29,9 +29,9 @@ export function useScrollMetrics(footerRef: RefObject<HTMLElement | null>): Scro
         const r = Math.min(1, Math.max(0, (h - top) / (h * 0.75)))
         setReveal((prev) => (Math.abs(prev - r) > 0.01 || (r === 0) !== (prev === 0) ? r : prev))
         floodRef.current = Math.min(1, Math.max(0, (h * 1.4 - top) / (h * 0.9)))
-        // Fond derrière la page (rebond, barre d'adresse flottante de Safari) :
-        // bleu dès que le footer est à l'écran, crème sinon
-        const end = top < h
+        // Fond derrière la page et teinte de la barre d'adresse du bas : bleus dès que
+        // le footer (et non son bord tramé) occupe le bas de l'écran
+        const end = top < h - 48
         const root = document.documentElement
         if ((root.dataset.end === '1') !== end) root.dataset.end = end ? '1' : '0'
       }

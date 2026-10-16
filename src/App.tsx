@@ -46,6 +46,7 @@ export function App() {
         </div>
 
         <Footer ref={footerRef} reveal={reveal} />
+        <div className="toolbar-tint" aria-hidden="true" />
       </div>
     </I18nProvider>
   )

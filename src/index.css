@@ -37,12 +37,29 @@ body {
     sans-serif;
 }
 
-/* Ce qui dépasse de la page (rebond du scroll, zone sous la barre d'adresse flottante)
-   et teinte des barres de Safari sur iOS 26, qui reprend la couleur de fond du body :
-   crème, puis bleu comme le footer quand on arrive en bas */
-html[data-end='1'],
-html[data-end='1'] body {
+/* Ce qui dépasse de la page (rebond du scroll) : bleu comme le footer en bas de page */
+html[data-end='1'] {
   background: var(--accent);
+}
+
+/* Safari iOS 26 teinte ses barres avec le fond du body (crème, pour la barre du haut),
+   sauf là où un élément fixe touche le bord : cette bande bleue colore donc uniquement
+   la barre d'adresse du bas, et seulement quand le footer occupe le bas de l'écran */
+.toolbar-tint {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: none;
+  height: 24px;
+  background: var(--accent);
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  html[data-end='1'] .toolbar-tint {
+    display: block;
+  }
 }
 
 a {

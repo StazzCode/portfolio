@@ -37,6 +37,12 @@ body {
     sans-serif;
 }
 
+/* Ce qui dépasse de la page (rebond du scroll, zone sous la barre d'adresse flottante
+   de Safari) : crème en haut comme le hero, bleu en bas comme le footer */
+html {
+  background: linear-gradient(to bottom, var(--cream) 50%, var(--accent) 50%);
+}
+
 a {
   color: var(--ink);
   text-decoration: none;
@@ -61,10 +67,10 @@ a:hover {
   left: 0;
   display: block;
   width: 100%;
-  /* Hauteur maximale de la fenêtre (barre d'adresse mobile repliée) : quand Safari
-     agrandit l'écran pendant le scroll, il n'apparaît pas de bande vide en bas */
-  height: 100vh;
-  height: 100lvh;
+  /* Plus haut que l'écran : Safari affiche la page sous sa barre d'adresse flottante,
+     zone que 100lvh ne couvre pas toujours. Le surplus sort simplement de l'écran. */
+  height: calc(100vh + 160px);
+  height: calc(100lvh + 160px);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }

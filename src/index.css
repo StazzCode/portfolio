@@ -37,9 +37,11 @@ body {
     sans-serif;
 }
 
-/* Ce qui dépasse de la page (rebond du scroll, zone sous la barre d'adresse flottante
-   de Safari) : crème, puis bleu comme le footer quand on arrive en bas */
-html[data-end='1'] {
+/* Ce qui dépasse de la page (rebond du scroll, zone sous la barre d'adresse flottante)
+   et teinte des barres de Safari sur iOS 26, qui reprend la couleur de fond du body :
+   crème, puis bleu comme le footer quand on arrive en bas */
+html[data-end='1'],
+html[data-end='1'] body {
   background: var(--accent);
 }
 

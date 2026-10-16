@@ -22,7 +22,8 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(function Footer({ rev
   const { t } = useI18n()
   const time = useParisTime()
   const width = typeof window !== 'undefined' ? window.innerWidth : 1440
-  const start = width <= 640 ? 16 : Math.max(0, (width - COLUMN) / 2)
+  // Mobile : pleine largeur d'emblée (sinon le fond clair apparaît sur les côtés)
+  const start = width <= 640 ? 0 : Math.max(0, (width - COLUMN) / 2)
   const inset = Math.round(start * (1 - reveal))
 
   return (

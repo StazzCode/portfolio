@@ -39,9 +39,40 @@ export function DitherBackground({ floodRef, probeRef, onProbe }: DitherBackgrou
       return 'page'
     }
 
+    /**
+     * Mobile : la colonne est transparente pour laisser voir le shader en haut.
+     * Lors d'un scroll rapide, iOS affiche le contenu avec un temps de retard et le
+     * shader apparaît à travers. On découpe donc le canvas pour qu'il n'existe que
+     * là où il doit être vu : la bande au-dessus du hero et la zone avant le footer.
+     * Ailleurs, c'est le fond crème de la page qui est derrière.
+     */
+    let lastClip = ''
+    const updateClip = () => {
+      let clip = 'none'
+      if (window.innerWidth <= MOBILE_MAX) {
+        const h = window.innerHeight
+        const heroTop = document.querySelector('.hero-card')?.getBoundingClientRect().top ?? 0
+        const sheetBottom = document.querySelector('.sheet')?.getBoundingClientRect().bottom ?? h
+        const top = heroTop > 0 // bande du haut visible
+        const bottom = sheetBottom < h // zone avant le footer visible
+        if (top && bottom) clip = 'none'
+        else if (top) clip = `inset(0 0 ${Math.max(0, h - heroTop)}px 0)`
+        else if (bottom) clip = `inset(${Math.max(0, sheetBottom)}px 0 0 0)`
+        else clip = 'inset(0 0 100% 0)'
+      }
+      if (clip !== lastClip) {
+        canvas.style.clipPath = clip
+        lastClip = clip
+      }
+    }
+    window.addEventListener('scroll', updateClip, { passive: true })
+    window.addEventListener('resize', updateClip)
+    updateClip()
+
     const renderer = createDither(canvas, {
       getFlood: () => floodRef.current ?? 0,
       afterDraw: (r) => {
+        updateClip()
         const probe = probeRef.current
         if (!probe) return
         const desktop = window.innerWidth > MOBILE_MAX
@@ -91,7 +122,11 @@ export function DitherBackground({ floodRef, probeRef, onProbe }: DitherBackgrou
       },
     })
 
-    return () => renderer?.destroy()
+    return () => {
+      renderer?.destroy()
+      window.removeEventListener('scroll', updateClip)
+      window.removeEventListener('resize', updateClip)
+    }
   }, [floodRef, probeRef])
 
   return <canvas ref={canvasRef} className="dither-canvas" aria-hidden="true" />

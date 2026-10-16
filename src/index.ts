@@ -1,39 +1,41 @@
 import { serve } from 'bun'
+import { readdirSync } from 'fs'
+import path from 'path'
 import index from './index.html'
+
+/**
+ * Fichiers de public/ servis tels quels (CV…), comme sur GitHub Pages où le build
+ * les copie à la racine du site. Sans ça, la route '/*' renverrait index.html.
+ */
+const PUBLIC_DIR = path.resolve(import.meta.dir, '..', 'public')
+
+function publicRoutes(): Record<string, Response> {
+  const routes: Record<string, Response> = {}
+  let files: string[] = []
+  try {
+    files = readdirSync(PUBLIC_DIR, { recursive: true }) as string[]
+  } catch {
+    return routes
+  }
+  for (const file of files) {
+    if (path.basename(file).startsWith('.')) continue
+    const blob = Bun.file(path.join(PUBLIC_DIR, file))
+    routes['/' + file.split(path.sep).join('/')] = new Response(blob)
+  }
+  return routes
+}
 
 const server = serve({
   routes: {
-    // Serve index.html for all unmatched routes.
+    ...publicRoutes(),
+    // Toutes les autres adresses renvoient l'application
     '/*': index,
-
-    '/api/hello': {
-      async GET(req) {
-        return Response.json({
-          message: 'Hello, world!',
-          method: 'GET',
-        })
-      },
-      async PUT(req) {
-        return Response.json({
-          message: 'Hello, world!',
-          method: 'PUT',
-        })
-      },
-    },
-
-    '/api/hello/:name': async (req) => {
-      const name = req.params.name
-      return Response.json({
-        message: `Hello, ${name}!`,
-      })
-    },
   },
 
   development: process.env.NODE_ENV !== 'production' && {
-    // Enable browser hot reloading in development
+    // Rechargement à chaud dans le navigateur
     hmr: true,
-
-    // Echo console logs from the browser to the server
+    // Affiche les logs du navigateur dans le terminal
     console: true,
   },
 })

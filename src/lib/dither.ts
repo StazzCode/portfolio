@@ -157,9 +157,19 @@ export function createDither(
   let last = performance.now()
   let raf = 0
 
+  let sizedW = 0
+  let sizedH = 0
   const resize = () => {
-    canvas.width = Math.ceil(window.innerWidth / px)
-    canvas.height = Math.ceil(window.innerHeight / px)
+    const w = window.innerWidth
+    const h = window.innerHeight
+    // Sur mobile, la barre d'adresse qui se replie change la hauteur pendant le scroll :
+    // redimensionner le canvas à chaque fois l'efface et le fait clignoter. On ignore
+    // ces petites variations de hauteur tant que la largeur ne change pas.
+    if (w === sizedW && Math.abs(h - sizedH) < 160) return
+    sizedW = w
+    sizedH = h
+    canvas.width = Math.ceil(w / px)
+    canvas.height = Math.ceil(h / px)
     gl.viewport(0, 0, canvas.width, canvas.height)
   }
 
